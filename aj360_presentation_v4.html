@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow & Tooling | AJ360</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b1120;
+            --bg-secondary: #131d2e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #818cf8;
+            --accent-pink: #c084fc;
+            --success: #4ade80;
+            --warning: #f9a875;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.04) 0%, transparent 50%);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        p, li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Slides Container */
+        .slides-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            max-height: 88vh;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px 40px;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .content-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* Hero Slide */
+        .hero-slide .content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .hero-slide h1 {
+            font-size: 3.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero-slide .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-slide .hero-image {
+            width: 400px;
+            max-width: 90%;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 210, 255, 0.2);
+        }
+
+        /* Image Slides */
+        .image-slide .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .image-slide .slide-image {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .image-slide .slide-content h1 {
+            font-size: 2rem;
+        }
+
+        /* Screenshot Slide */
+        .screenshot-slide .content-wrapper {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .screenshot-slide .screenshot-img {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Cards */
+        .info-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 210, 255, 0.3);
+        }
+
+        .info-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .info-card h3::before {
+            content: '';
+            width: 3px;
+            height: 1em;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .info-card p {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+        }
+
+        /* Expandable Card */
+        .expandable-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 0.6rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .expandable-header {
+            padding: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .expandable-header:hover {
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        .expandable-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .expandable-header h3::before {
+            content: '';
+            width: 3px;
+            height: 1em;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+            color: var(--accent-cyan);
+        }
+
+        .expandable-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding: 0 14px;
+        }
+
+        .expandable-card.expanded .expandable-content {
+            max-height: 500px;
+            padding: 0 14px 14px;
+        }
+
+        .expandable-content ul {
+            margin-top: 10px;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        /* Metrics */
+        .metric-card {
+            background: linear-gradient(145deg, rgba(0, 210, 255, 0.08) 0%, rgba(0, 210, 255, 0.02) 100%);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Big Numbers */
+        .big-numbers {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .big-number {
+            text-align: center;
+        }
+
+        .big-number .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            line-height: 1;
+        }
+
+        .big-number .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Progress Bars */
+        .progress-item {
+            margin-bottom: 10px;
+        }
+
+        .progress-item .label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+        }
+
+        .progress-bar-bg {
+            height: 7px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .progress-bar-fill.cyan { background: var(--accent-cyan); }
+        .progress-bar-fill.purple { background: var(--accent-purple); }
+        .progress-bar-fill.green { background: var(--success); }
+        .progress-bar-fill.orange { background: var(--warning); }
+
+        /* Team Cards - Clickable */
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 15px 40px rgba(0, 210, 255, 0.2);
+        }
+
+        .team-card .avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .team-card .name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .team-card .role {
+            font-size: 0.65rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Animated Badge */
+        .mission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            position: relative;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .mission-badge.cyan {
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .mission-badge.purple {
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
+        }
+
+        .mission-badge.green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+        }
+
+        .mission-badge.orange {
+            background: rgba(249, 168, 117, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(249, 168, 117, 0.4);
+            box-shadow: 0 0 15px rgba(249, 168, 117, 0.3);
+        }
+
+        .mission-badge .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: dot-pulse 1.5s ease-in-out infinite;
+        }
+
+        .mission-badge.cyan .pulse-dot { background: var(--accent-cyan); }
+        .mission-badge.purple .pulse-dot { background: var(--accent-purple); }
+        .mission-badge.green .pulse-dot { background: var(--success); }
+        .mission-badge.orange .pulse-dot { background: var(--warning); }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes dot-pulse {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+
+        .team-card:hover .mission-badge {
+            animation: none;
+            transform: scale(1.05);
+        }
+
+        /* Sponsor Card */
+        .sponsor-card {
+            background: linear-gradient(145deg, rgba(129, 140, 248, 0.1), transparent);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .sponsor-card .count {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-purple);
+        }
+
+        .sponsor-card .name {
+            font-size: 0.75rem;
+            color: #fff;
+            margin-top: 3px;
+        }
+
+        /* Lists */
+        ul {
+            list-style: none;
+        }
+
+        li {
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 6px var(--accent-cyan);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .tag-cyan {
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+        }
+
+        .tag-purple {
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .tag-green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .tag-orange {
+            background: rgba(249, 168, 117, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(249, 168, 117, 0.3);
+        }
+
+        /* Donut Charts */
+        .donut-chart {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #60a5fa 0% 7.2%,
+                #f9a875 7.2% 20.5%,
+                #818cf8 20.5% 26.7%,
+                #86efac 26.7% 44.5%,
+                #c084fc 44.5% 72.8%,
+                #4ade80 72.8% 100%
+            );
+            position: relative;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .donut-chart::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .mini-donut {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #00d2ff 0% 36.4%,
+                #818cf8 36.4% 68.2%,
+                #4ade80 68.2% 79.6%,
+                #f9a875 79.6% 91%,
+                #c084fc 91% 100%
+            );
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .mini-donut::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 10;
+        }
+
+        .modal-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .modal-title h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-title .role {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 25px 30px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: var(--accent-cyan);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-section h3::before {
+            content: '';
+            width: 4px;
+            height: 1em;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .modal-section ul li {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        /* Navigation */
+        .logo {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            z-index: 50;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            background: #000;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+        }
+
+        .progress-line {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        .slide-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            z-index: 50;
+        }
+
+        .slide-indicator span:first-child {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 8px;
+            z-index: 50;
+        }
+
+        .btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide.active .content-wrapper > * {
+            animation: fadeInUp 0.5s ease backwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3, .grid-4, .grid-5 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .image-slide .content-wrapper,
+            .screenshot-slide .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 1.6rem; }
+            .hero-slide h1 { font-size: 2rem; }
+            .content-wrapper { padding: 20px; }
+        }
+
+        /* Thank You Slide */
+        .thank-you-slide .content-wrapper {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .thank-you-slide h1 {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #000;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.3);
+        }
+
+        /* Section Badge */
+        .section-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 15px;
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        /* Workflow Bar */
+        .workflow-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .workflow-bar .name {
+            flex: 1;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .workflow-bar .bar {
+            flex: 2;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .workflow-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .workflow-bar .count {
+            width: 25px;
+            text-align: right;
+            font-size: 0.75rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Note Card */
+        .note-card {
+            background: linear-gradient(145deg, rgba(249, 168, 117, 0.1), transparent);
+            border: 1px solid rgba(249, 168, 117, 0.3);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .note-card .icon {
+            font-size: 1.2rem;
+        }
+
+        .note-card p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--warning);
+        }
+
+        /* Workstream List */
+        .workstream-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        /* Capacity Card */
+        .capacity-card {
+            background: linear-gradient(145deg, rgba(0, 210, 255, 0.05), transparent);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .capacity-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .capacity-card .unit {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/aj360_logo.jpg" alt="AJ360" class="logo" onerror="this.style.display='none'">
+    <div class="progress-line" id="progress-line"></div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Hero -->
+        <section class="slide hero-slide active">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/nervous-system.png" alt="Nervous System" class="hero-image">
+                <h1>Workflow & Tooling</h1>
+                <p class="subtitle">The Nervous System of AJ360</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <span class="tag tag-cyan">24 Workstreams</span>
+                    <span class="tag tag-purple">118 Workflows</span>
+                    <span class="tag tag-green">1,475 Requests</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Section Scope -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <div class="slide-content">
+                    <span class="section-badge">Section Focus</span>
+                    <h1>Orchestrating Efficient Cross-Functional Workflows</h1>
+                    
+                    <div class="expandable-card expanded">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Purpose</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>To design, implement, and operate workflow systems that streamline operations and enable data visibility.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Scale</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>The unit manages <strong>20+ diverse workstreams</strong> across the AJ360 platform.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Core Value</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>We bring efficiency by connecting data, teams, and systems to improve end-to-end operations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Operational Promise</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>To eliminate manual data entry, accelerate processing, and lower operational costs through the implementation of a unique <strong>OTT-ID system via Airtable</strong> to create a single source of truth for all content.</p>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/nervous-system.png" alt="Nervous System" class="slide-image">
+            </div>
+        </section>
+
+        <!-- Slide 3: Infrastructure -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/connected-platforms.png" alt="Connected Platforms" class="slide-image">
+                <div class="slide-content">
+                    <span class="section-badge">Infrastructure</span>
+                    <h1>Connected Ecosystem</h1>
+                    
+                    <div class="grid-2" style="gap: 10px; margin-bottom: 15px;">
+                        <div class="metric-card">
+                            <div class="metric-value">90+</div>
+                            <div class="metric-label">Airtable Bases</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">44</div>
+                            <div class="metric-label">Active Automations</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">118</div>
+                            <div class="metric-label">Workflows</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">6</div>
+                            <div class="metric-label">Platforms</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <span class="tag tag-cyan">Airtable</span>
+                        <span class="tag tag-purple">Frame.io</span>
+                        <span class="tag tag-cyan">Slack</span>
+                        <span class="tag tag-purple">Google Drive</span>
+                        <span class="tag tag-cyan">AJ360 App</span>
+                        <span class="tag tag-purple">CMS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Team Structure -->
+        <section class="slide">
+            <div class="content-wrapper">
+                <span class="section-badge">Structure</span>
+                <h1>A Specialized Four-Team Framework</h1>
+                
+                <div class="grid-2" style="margin-top: 15px;">
+                    <div>
+                        <div class="expandable-card expanded">
+                            <div class="expandable-header" onclick="toggleExpand(this)">
+                                <h3>1. Workflow Architecture</h3>
+                                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="expandable-content">
+                                <p>Leads the design of structured workflows, ensuring all processes are documented.</p>
+                                <ul>
+                                    <li>Design, documentation, SOP management</li>
+                                    <li>Workflow diagrams & data flow models</li>
+                                    <li>Process optimization</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="expandable-card">
+                            <div class="expandable-header" onclick="toggleExpand(this)">
+                                <h3>2. Implementation & Automation</h3>
+                                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="expandable-content">
+                                <p>Builds and maintains user interfaces & technical integrations.</p>
+                                <ul>
+                                    <li>Airtable interfaces & automations</li>
+                                    <li>Slack, CMS, Drive, Frame.io integrations</li>
+                                    <li>Custom scripts (Python, JavaScript)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="expandable-card">
+                            <div class="expandable-header" onclick="toggleExpand(this)">
+                                <h3>3. Data Reliability & Monitoring</h3>
+                                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="expandable-content">
+                                <p>Conducts daily audits and maintains data hygiene.</p>
+                                <ul>
+                                    <li>Daily record audits (Airtable ↔ CMS)</li>
+                                    <li>Automated backups</li>
+                                    <li>Bulk updates & migrations</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="expandable-card">
+                            <div class="expandable-header" onclick="toggleExpand(this)">
+                                <h3>4. Support Operations</h3>
+                                <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                            <div class="expandable-content">
+                                <p>Manages the Service Desk across 7 categories.</p>
+                                <ul>
+                                    <li>Bug - Something is broken</li>
+                                    <li>Access Request - New or change access</li>
+                                    <li>Clarification - Explain something</li>
+                                    <li>Data Update - Update data for me</li>
+                                    <li>Modify Existing - Change what's built</li>
+                                    <li>New Build - Build something new</li>
+                                    <li>External Request - From other teams</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Headcount Roadmap</h2>
+                        <div class="info-card" style="background: linear-gradient(145deg, rgba(0, 210, 255, 0.08), transparent);">
+                            <h3 style="margin-bottom: 5px;">2025 - Current</h3>
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan);">5</div>
+                            <p>1 Section Head + 1 dedicated role per team</p>
+                        </div>
+                        <div class="info-card" style="background: linear-gradient(145deg, rgba(129, 140, 248, 0.08), transparent);">
+                            <h3 style="margin-bottom: 5px;">2026 - Planned</h3>
+                            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-purple);">7</div>
+                            <p>Head, 2 Service Desk, 2 Building, 1 Project Mgmt, 1 Database</p>
+                        </div>
+                        
+                        <h2 style="margin-top: 15px;">Leadership</h2>
+                        <p style="font-size: 0.85rem;">A Section Head oversees strategy, prioritization, resourcing, and stakeholder alignment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Team Members -->
+        <section class="slide">
+            <div class="content-wrapper">
+                <span class="section-badge">Meet The Team</span>
+                <h1>Our People</h1>
+                
+                <div class="grid-4" style="margin-top: 15px;">
+                    <div class="team-card" onclick="openModal('hamza')">
+                        <div class="avatar">HA</div>
+                        <div class="name">Hamza Aslan</div>
+                        <div class="role">Head of Section</div>
+                        <p style="margin-top: 6px; font-size: 0.7rem;">10+ years media production</p>
+                        <div class="mission-badge cyan">
+                            <span class="pulse-dot"></span>
+                            <span>Strategy & Leadership</span>
+                        </div>
+                    </div>
+                    <div class="team-card" onclick="openModal('dervis')" style="border-color: rgba(129, 140, 248, 0.3);">
+                        <div class="avatar" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));">MD</div>
+                        <div class="name">Muhammed Derviş</div>
+                        <div class="role">Building & Integrations</div>
+                        <p style="margin-top: 6px; font-size: 0.7rem;">15+ years software dev</p>
+                        <div class="mission-badge purple">
+                            <span class="pulse-dot"></span>
+                            <span>Build • Automate • Maintain</span>
+                        </div>
+                    </div>
+                    <div class="team-card" onclick="openModal('abed')" style="border-color: rgba(74, 222, 128, 0.3);">
+                        <div class="avatar" style="background: linear-gradient(135deg, var(--success), var(--accent-cyan));">AS</div>
+                        <div class="name">Abed Said</div>
+                        <div class="role">Database Management</div>
+                        <p style="margin-top: 6px; font-size: 0.7rem;">OTT content lifecycle</p>
+                        <div class="mission-badge green">
+                            <span class="pulse-dot"></span>
+                            <span>Data & Pipeline</span>
+                        </div>
+                    </div>
+                    <div class="team-card" onclick="openModal('balqees')" style="border-color: rgba(249, 168, 117, 0.3);">
+                        <div class="avatar" style="background: linear-gradient(135deg, var(--warning), var(--accent-purple));">BM</div>
+                        <div class="name">Balqees Mosalem</div>
+                        <div class="role">Workflow Orchestration</div>
+                        <p style="margin-top: 6px; font-size: 0.7rem;">9+ years Product Mgmt</p>
+                        <div class="mission-badge orange">
+                            <span class="pulse-dot"></span>
+                            <span>Design & Docs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Workstreams Served -->
+        <section class="slide">
+            <div class="content-wrapper">
+                <span class="section-badge">Coverage</span>
+                <h1>20+ Workstreams Served</h1>
+                
+                <div class="grid-2" style="margin-top: 15px;">
+                    <div>
+                        <div class="workstream-list">
+                            <span class="tag tag-cyan">Content Planning</span>
+                            <span class="tag tag-purple">Metadata Preparation</span>
+                            <span class="tag tag-green">Media Management</span>
+                            <span class="tag tag-orange">Content Distribution</span>
+                            <span class="tag tag-cyan">Upscaling</span>
+                            <span class="tag tag-purple">Creative</span>
+                            <span class="tag tag-green">Ingest & Publishing</span>
+                            <span class="tag tag-orange">Fast / VLL</span>
+                            <span class="tag tag-cyan">Originals Production</span>
+                            <span class="tag tag-purple">Captions & Subtitles</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="workstream-list">
+                            <span class="tag tag-green">Outreach</span>
+                            <span class="tag tag-orange">SEO</span>
+                            <span class="tag tag-cyan">CRM</span>
+                            <span class="tag tag-purple">Community</span>
+                            <span class="tag tag-green">Engagement</span>
+                            <span class="tag tag-orange">Creative Engagement</span>
+                            <span class="tag tag-cyan">Promo</span>
+                            <span class="tag tag-purple">Ads</span>
+                            <span class="tag tag-green">Research & Analytics</span>
+                            <span class="tag tag-orange">Product Development</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 20px;">Workstream Sponsors</h2>
+                <div class="grid-5" style="margin-top: 10px;">
+                    <div class="sponsor-card">
+                        <div class="count">8</div>
+                        <div class="name">Jonathan Powell</div>
+                    </div>
+                    <div class="sponsor-card">
+                        <div class="count">6</div>
+                        <div class="name">MURAT YILDIRIM</div>
+                    </div>
+                    <div class="sponsor-card">
+                        <div class="count">3</div>
+                        <div class="name">Ahmad Qarawi</div>
+                    </div>
+                    <div class="sponsor-card">
+                        <div class="count">3</div>
+                        <div class="name">Mohamad Darwiche</div>
+                    </div>
+                    <div class="sponsor-card">
+                        <div class="count">3</div>
+                        <div class="name">Awad Joumaa</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Automations -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <div class="slide-content">
+                    <span class="section-badge">Automation</span>
+                    <h1>The Engine Room</h1>
+                    
+                    <div class="big-numbers" style="justify-content: flex-start; gap: 20px;">
+                        <div class="big-number">
+                            <div class="value">47</div>
+                            <div class="label">Total</div>
+                        </div>
+                        <div class="big-number">
+                            <div class="value" style="color: var(--success);">44</div>
+                            <div class="label">Active</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Categories</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        <span class="tag tag-cyan">PDI Push (8)</span>
+                        <span class="tag tag-purple">Publish Status (7)</span>
+                        <span class="tag tag-green">QC Publishing (7)</span>
+                        <span class="tag tag-orange">Planning (4)</span>
+                        <span class="tag tag-cyan">Ingest Tracking (3)</span>
+                        <span class="tag tag-purple">Artwork (3)</span>
+                        <span class="tag tag-green">Notifications (3)</span>
+                        <span class="tag tag-orange">Metadata (2)</span>
+                    </div>
+                </div>
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/automation-engine.png" alt="Automation Engine" class="slide-image">
+            </div>
+        </section>
+
+        <!-- Slide 8: Task Intake Form -->
+        <section class="slide screenshot-slide">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/task-intake-form.png" alt="Task Intake Form" class="screenshot-img">
+                <div class="slide-content">
+                    <span class="section-badge">Service Desk</span>
+                    <h1>Request Intake</h1>
+                    
+                    <div class="info-card">
+                        <h3>7 Request Categories</h3>
+                        <p>Bug, Access Request, Clarification, Data Update, Modify Existing, New Build, External</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Smart Routing</h3>
+                        <p>Requests auto-posted to relevant Slack channel</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Full Transparency</h3>
+                        <p>Every request tracked from submission to completion</p>
+                    </div>
+                    
+                    <a href="https://airtable.com/apprb9mHrM9WP6enw/pagXHgrkog7ccQ1sU/form" target="_blank" class="contact-btn" style="font-size: 0.8rem; padding: 8px 16px; margin-top: 10px;">
+                        🔗 View Live Form
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Slack Integration -->
+        <section class="slide screenshot-slide">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/slack-channel.jpg" alt="Slack Workflow Requests" class="screenshot-img">
+                <div class="slide-content">
+                    <span class="section-badge">Communication</span>
+                    <h1>Slack Integration</h1>
+                    
+                    <div class="info-card">
+                        <h3>21 Workflow Channels</h3>
+                        <p>workflow-requests-engagement, creative, metadata, etc.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Instant Notifications</h3>
+                        <p>Ticket #, Requester, Type, Urgency - all visible</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Threaded Discussions</h3>
+                        <p>All communication stays organized</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Throughput & Capacity -->
+        <section class="slide">
+            <div class="content-wrapper">
+                <span class="section-badge">Operations</span>
+                <h1>Throughput & Capacity</h1>
+                
+                <div class="grid-2" style="margin-top: 15px;">
+                    <div>
+                        <h2>Task Categorization</h2>
+                        <div class="info-card">
+                            <h3>Ad-hoc Tasks</h3>
+                            <p>Handled immediately as they arise - high-impact, quick turnaround</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>Sprint Tasks</h3>
+                            <p>Planned work assigned in weekly planning meetings based on impact & readiness</p>
+                        </div>
+                        
+                        <h2 style="margin-top: 15px;">Team Capacity</h2>
+                        <div class="grid-2" style="gap: 10px;">
+                            <div class="capacity-card">
+                                <div class="value">20</div>
+                                <div class="unit">hrs/week Ad-hoc Support</div>
+                            </div>
+                            <div class="capacity-card">
+                                <div class="value">10</div>
+                                <div class="unit">hrs/week per Builder</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Request Metrics</h2>
+                        <div class="big-numbers" style="justify-content: center; margin: 15px 0;">
+                            <div class="big-number">
+                                <div class="value">1,475</div>
+                                <div class="label">Total Requests</div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 15px;">By Urgency</h3>
+                        <div class="progress-item">
+                            <div class="label"><span>🔴 Critical</span><span>8.3%</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 8.3%; background: #ef4444;"></div></div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="label"><span>🟠 High</span><span>45.1%</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill orange" style="width: 45.1%"></div></div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="label"><span>🟡 Medium</span><span>44.7%</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 44.7%; background: #fbbf24;"></div></div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="label"><span>🟢 Low</span><span>1.8%</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill green" style="width: 1.8%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Hidden Work (Iceberg) -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <div class="slide-content">
+                    <span class="section-badge">Reality Check</span>
+                    <h1>The Hidden 90%</h1>
+                    <p style="font-size: 0.95rem; margin-bottom: 12px;">
+                        <strong>Logged tasks represent ~50% of actual work delivered</strong>
+                    </p>
+                    
+                    <div class="expandable-card expanded">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Ad-Hoc Requests</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>Handled immediately as they arise; high-impact, untracked effort.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Ingest Pipeline Monitoring (18 hrs/day)</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>Daily troubleshooting and coordination between BET, ES, Media, Metadata, and Publishing teams.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Bulk Updates (2025)</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <p>Five large-scale updates executed, affecting over <strong>100,000 CMS records</strong>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>Other Hidden Work</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Feature Deployment Validation - testing new releases</li>
+                                <li>User Audits & Access Requests - permissions management</li>
+                                <li>Data Clarifications & Inspections - field-level metadata analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/iceberg-hidden-work.png" alt="Iceberg - Hidden Work" class="slide-image">
+            </div>
+        </section>
+
+        <!-- Slide 12: Workflow Locations -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/workstream-network.png" alt="Workstream Network" class="slide-image">
+                <div class="slide-content">
+                    <span class="section-badge">Global</span>
+                    <h1>118 Workflows</h1>
+                    
+                    <div class="grid-2" style="gap: 10px; margin-bottom: 15px;">
+                        <div class="metric-card">
+                            <div class="metric-value">74</div>
+                            <div class="metric-label">Doha (62.7%)</div>
+                        </div>
+                        <div class="metric-card" style="background: linear-gradient(145deg, rgba(129, 140, 248, 0.08), transparent); border-color: rgba(129, 140, 248, 0.2);">
+                            <div class="metric-value" style="background: linear-gradient(135deg, #fff, var(--accent-purple)); -webkit-background-clip: text;">17</div>
+                            <div class="metric-label">Istanbul (14.4%)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2" style="gap: 10px;">
+                        <div class="metric-card" style="padding: 12px;">
+                            <div class="metric-value" style="font-size: 1.8rem;">15</div>
+                            <div class="metric-label">Online</div>
+                        </div>
+                        <div class="metric-card" style="padding: 12px;">
+                            <div class="metric-value" style="font-size: 1.8rem;">9</div>
+                            <div class="metric-label">Internal</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 12px;">Top Coordinators</h3>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                        Jummana (13) • Arkan (11) • Omaima (11) • Mohamad (10) • Abdulrahman (9)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: 2026 Roadmap -->
+        <section class="slide image-slide">
+            <div class="content-wrapper">
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/roadmap-2026.png" alt="Roadmap 2026" class="slide-image">
+                <div class="slide-content">
+                    <span class="section-badge">Future</span>
+                    <h1>2026 Roadmap</h1>
+                    
+                    <div class="expandable-card expanded">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>1. Enhanced Interoperability</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Integrate with upstream partners for comprehensive publishing foresight</li>
+                                <li>Establish real-time visibility for Marketing and Planning teams</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>2. Automation Excellence</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Eliminate manual handovers</li>
+                                <li>Expand Airtable AI integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>3. Company Brain</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Diagram all workflows to preserve institutional knowledge</li>
+                                <li>Standardize documentation to reduce individual dependency</li>
+                                <li>Ensure management has real-time visibility</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>4. Data Lake & AI Integration</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Feed centralized data lake with structured Airtable data</li>
+                                <li>Prepare for AI scalability and network-wide automation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="expandable-card">
+                        <div class="expandable-header" onclick="toggleExpand(this)">
+                            <h3>5. BET Collaboration</h3>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                        <div class="expandable-content">
+                            <ul>
+                                <li>Coordinate metadata for new features (e.g., "participants")</li>
+                                <li>Support English app infrastructure launch</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Thank You -->
+        <section class="slide thank-you-slide">
+            <div class="content-wrapper">
+                <h1>Thank You!</h1>
+                <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px;">
+                    Questions, feedback, or collaboration opportunities?
+                </p>
+                
+                <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; justify-content: center;">
+                    <div class="team-card" style="padding: 12px 18px; cursor: default;">
+                        <div class="name">Hamza Aslan</div>
+                        <div class="role">Head</div>
+                    </div>
+                    <div class="team-card" style="padding: 12px 18px; cursor: default;">
+                        <div class="name">Mohamed Dervis</div>
+                        <div class="role">Building</div>
+                    </div>
+                    <div class="team-card" style="padding: 12px 18px; cursor: default;">
+                        <div class="name">Abed Said</div>
+                        <div class="role">Database</div>
+                    </div>
+                    <div class="team-card" style="padding: 12px 18px; cursor: default;">
+                        <div class="name">Balqees Moselm</div>
+                        <div class="role">Workflow</div>
+                    </div>
+                </div>
+                
+                <a href="https://airtable.com/apprb9mHrM9WP6enw/pagXHgrkog7ccQ1sU/form" class="contact-btn" target="_blank">
+                    📝 Submit a Request
+                </a>
+                
+                <img src="https://cdn.jsdelivr.net/gh/mfarrag2050/md-img-assets@main/aj360_logo.jpg" alt="AJ360" style="width: 60px; margin-top: 20px; border-radius: 50%; border: 2px solid rgba(0, 210, 255, 0.3);" onerror="this.style.display='none'">
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <!-- Hamza Modal -->
+        <div class="modal" id="modal-hamza" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-avatar">HA</div>
+                <div class="modal-title">
+                    <h2>Hamza Aslan</h2>
+                    <div class="role">Head of Workflow & Tooling</div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Education & Certifications</h3>
+                    <ul>
+                        <li>Master's in New Media - focus on digital platforms, audience behavior, and modern content ecosystems</li>
+                        <li>Airtable MVP</li>
+                        <li>Certified Airtable Enterprise Admin & Builder</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Experience</h3>
+                    <ul>
+                        <li><strong>10+ years</strong> of media production & operations experience</li>
+                        <li>Established Platform Operations at <strong>tabii</strong> - designed advanced workflows for ingest, localization, artwork, and metadata across 200+ team members</li>
+                        <li>Previously led multimedia projects for <strong>Al Jazeera, DW, Amazon Prime</strong>, and other major broadcasters</li>
+                        <li>Produced <strong>150+ successful media projects</strong></li>
+                        <li>Deep expertise in enterprise-grade tools: Airtable, Frame.io, Google Cloud Storage, Slack Connect</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Key Responsibilities</h3>
+                    <ul>
+                        <li>One man show → Head of Workflow & Tooling</li>
+                        <li>Key participant in leading the product from the editorial/business perspective</li>
+                        <li>Strategy, prioritization, resourcing, and stakeholder alignment</li>
+                    </ul>
+                </div>
+                <div class="modal-tags">
+                    <span class="tag tag-cyan">Airtable MVP</span>
+                    <span class="tag tag-purple">Enterprise Admin</span>
+                    <span class="tag tag-green">10+ Years</span>
+                    <span class="tag tag-orange">150+ Projects</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dervis Modal -->
+        <div class="modal" id="modal-dervis" onclick="event.stopPropagation()" style="display: none;">
+            <div class="modal-header">
+                <div class="modal-avatar" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));">MD</div>
+                <div class="modal-title">
+                    <h2>Muhammed Derviş</h2>
+                    <div class="role">Building & Integrations</div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Certifications</h3>
+                    <ul>
+                        <li>Airtable Certified Builder</li>
+                        <li>Airtable Certified Admin</li>
+                        <li>Airtable AI App Builder</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Experience</h3>
+                    <ul>
+                        <li><strong>15+ years</strong> software development experience in PHP, Python, JavaScript, and SQL</li>
+                        <li>Strong background in API integrations and system architecture</li>
+                        <li><strong>11 years at Anadolu Agency</strong> (Turkey's State News Agency): Deputy Editor-in-Chief leading 30+ journalists, then Digital Department Manager</li>
+                        <li>Built <strong>25+ automated workflows</strong> integrating Slack, Google Workspace, WordPress, Zoom - reducing coordination time by 35%</li>
+                        <li>Deep expertise in automation platforms: Airtable Automations, Make.com, n8n, Zapier, Slack Workflows</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Key Responsibilities</h3>
+                    <ul>
+                        <li><strong>Airtable Systems:</strong> Build and manage databases, interfaces, and automations</li>
+                        <li><strong>Slack Workflows:</strong> Create and maintain Slack workflows; integrate Slack API</li>
+                        <li><strong>Troubleshooting:</strong> Resolve Airtable issues; coordinate with support</li>
+                        <li><strong>Integrations:</strong> Connect Airtable with Google Workspace and other tools via APIs</li>
+                        <li><strong>Data Ops:</strong> Sync, archive, and migrate records across systems</li>
+                        <li><strong>Custom Scripts:</strong> Develop advanced scripts with Python and JavaScript</li>
+                        <li><strong>Training & Docs:</strong> Train users, document system changes</li>
+                    </ul>
+                </div>
+                <div class="modal-tags">
+                    <span class="tag tag-purple">15+ Years Dev</span>
+                    <span class="tag tag-cyan">Certified Builder</span>
+                    <span class="tag tag-green">25+ Workflows</span>
+                    <span class="tag tag-orange">API Expert</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abed Modal -->
+        <div class="modal" id="modal-abed" onclick="event.stopPropagation()" style="display: none;">
+            <div class="modal-header">
+                <div class="modal-avatar" style="background: linear-gradient(135deg, var(--success), var(--accent-cyan));">AS</div>
+                <div class="modal-title">
+                    <h2>Abed Said</h2>
+                    <div class="role">Database Management</div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Experience</h3>
+                    <ul>
+                        <li>Extensive experience in <strong>digital content management on OTT platforms</strong></li>
+                        <li>Worked at <strong>NoorPlay</strong> as Digital Content Manager - full content lifecycle from delivery to publication</li>
+                        <li>Handled preparation of all incoming content: videos, subtitle files, dubbed audio tracks</li>
+                        <li>Managed creation of promotional materials: posters, trailers, social media assets</li>
+                        <li>Ensured content met quality standards for broadcast and publishing</li>
+                        <li>Managed CMS and archived all metadata and media files</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Key Responsibilities</h3>
+                    <ul>
+                        <li><strong>Daily Monitoring:</strong> Ingest pipeline monitoring, resolving issues with publishing, media, backend, or ES teams</li>
+                        <li><strong>Airtable Data:</strong> Entering new content and updating records for planning, digitization, and metadata teams</li>
+                        <li><strong>CMS Review:</strong> Cross-checking accuracy against Airtable, identifying and resolving duplicates</li>
+                        <li><strong>User Management:</strong> Managing accounts and permissions across Airtable, Slack, and Drive</li>
+                        <li><strong>Workflow Optimization:</strong> Collaborating with teams to troubleshoot and continuously optimize</li>
+                    </ul>
+                </div>
+                <div class="modal-tags">
+                    <span class="tag tag-green">OTT Expert</span>
+                    <span class="tag tag-cyan">Content Lifecycle</span>
+                    <span class="tag tag-purple">CMS Management</span>
+                    <span class="tag tag-orange">Quality Assurance</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balqees Modal -->
+        <div class="modal" id="modal-balqees" onclick="event.stopPropagation()" style="display: none;">
+            <div class="modal-header">
+                <div class="modal-avatar" style="background: linear-gradient(135deg, var(--warning), var(--accent-purple));">BM</div>
+                <div class="modal-title">
+                    <h2>Balqees Mosalem</h2>
+                    <div class="role">Workflow Orchestration</div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Experience</h3>
+                    <ul>
+                        <li><strong>9+ years as Product Manager</strong> - leading digital products with focus on OTT/VOD platforms</li>
+                        <li>Started career at <strong>Shahid</strong> - improved UX, personalized content journeys, supported growth of large-scale Arabic streaming platform</li>
+                        <li>Moved to <strong>Aurora VOD</strong> in technical role - managed end-to-end OTT products including CMS systems, streaming applications, Live Video workflows</li>
+                        <li>At <strong>Al Jazeera Network (PDI team)</strong> - evaluated digital tools, unified operational solutions, delivered training on MAM, CMS, and related systems</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h3>Key Responsibilities</h3>
+                    <ul>
+                        <li><strong>Workflow Design:</strong> Designing and maintaining workflow diagrams, system architecture maps, and data flow models</li>
+                        <li><strong>Request Analysis:</strong> Receiving and analyzing new requests, documenting existing processes, designing optimized workflows</li>
+                        <li><strong>Solution Delivery:</strong> Reviewing and delivering new solutions, leading user onboarding and adoption</li>
+                        <li><strong>Documentation:</strong> Preparing workflow, interface, and technical documentation</li>
+                        <li><strong>Feature Tracking:</strong> Evaluating new features across Airtable, Slack, Frame.io, Google Drive, Miro, Zoom</li>
+                        <li><strong>Reporting:</strong> Preparing team decks, progress updates, and periodic reports to stakeholders</li>
+                    </ul>
+                </div>
+                <div class="modal-tags">
+                    <span class="tag tag-orange">9+ Years PM</span>
+                    <span class="tag tag-purple">Shahid</span>
+                    <span class="tag tag-cyan">Aurora VOD</span>
+                    <span class="tag tag-green">OTT/VOD Expert</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide Indicator -->
+    <div class="slide-indicator">
+        <span id="current-slide">1</span>
+        <span style="opacity: 0.5;"> / </span>
+        <span id="total-slides">14</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn" onclick="prevSlide()" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <button class="btn" onclick="nextSlide()" aria-label="Next">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const currentSlideEl = document.getElementById('current-slide');
+        const totalSlidesEl = document.getElementById('total-slides');
+        const progressLine = document.getElementById('progress-line');
+        const modalOverlay = document.getElementById('modal-overlay');
+
+        totalSlidesEl.textContent = totalSlides;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlideIndex) {
+                    slide.classList.add('active');
+                }
+            });
+            currentSlideEl.textContent = currentSlideIndex + 1;
+            progressLine.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                updateSlide();
+            }
+        }
+
+        // Expandable cards
+        function toggleExpand(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // Modal functions
+        function openModal(person) {
+            // Hide all modals first
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            // Show selected modal
+            document.getElementById('modal-' + person).style.display = 'block';
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== modalOverlay) return;
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (modalOverlay.classList.contains('active')) {
+                if (e.key === 'Escape') closeModal();
+                return;
+            }
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Touch/Swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            if (modalOverlay.classList.contains('active')) return;
+            const diff = e.changedTouches[0].screenX - touchStartX;
+            if (diff < -50) nextSlide();
+            if (diff > 50) prevSlide();
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
